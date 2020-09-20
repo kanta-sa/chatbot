@@ -1,26 +1,86 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import defaultDataset from "./dataset";
+import "./assets/styles/style.css";
+import {AnswersList, Chats} from "./components/index"
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+
+export default class App extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      answers: [],
+      chats: [],
+      currentId: "init",
+      dataset: defaultDataset,
+      open: false
+    }
+    this.selectAnswer = this.selectAnswer.bind(this)
+  }
+
+  displayNextQuestion = (nextQuestionId) => {
+    const chats = this.state.chats;
+    chats.push({
+      text: this.state.dataset[nextQuestionId].question,
+      type: 'question'
+    })
+
+    this.setState({
+      answers: this.state.dataset[nextQuestionId].answers,
+      chats: chats,
+      currentId: nextQuestionId
+    })
+  }
+
+  selectAnswer = (selectedAnswer, nextQuestionId) => {
+    switch(true){
+      case (nextQuestionId === 'init'):
+        this.displayNextQuestion(nextQuestionId);
+        break;
+      case (/^https:*/.test(nextQuestionId)):
+        const a = document.createElement("a");
+        a.href = nextQuestionId;
+        a.target = "_blank"; //リンクを別タブで表示させる
+        a.click();
+        break;
+      default:
+        const chats = this.state.chats;
+        chats.push({
+          text: selectedAnswer,
+          type: "answer"
+        });
+
+        this.setState({
+          chats: chats
+        });
+        setTimeout(() => this.displayNextQuestion(nextQuestionId), 1000);
+
+        break;
+    }
+  }
+
+  #最初のレンダー後にデータをいれる
+  componentDidMount() {
+    const initAnswer = "";
+    this.selectAnswer(initAnswer, this.state.currentId);
+  }
+
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    const scrollArea = document.getElementById('scroll-area');
+    if (scrollArea){
+      scrollArea.scrollTop = scrollArea.scrollHeight
+    }
+  }
+
+  render(){
+    return(
+      <div className="adjust-screen">
+        <div className="chat-area">
+          <Chats chats={this.state.chats} />
+          <AnswersList answers={this.state.answers} select={this.selectAnswer} />
+        </div>
+      </div>
+    );
+  }
 }
 
-export default App;
+
