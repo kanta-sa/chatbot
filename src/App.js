@@ -2,6 +2,7 @@ import React from 'react';
 import defaultDataset from "./dataset";
 import "./assets/styles/style.css";
 import {AnswersList, Chats} from "./components/index"
+import FormDialog from "./components/Forms/FormDialog";
 
 
 export default class App extends React.Component {
@@ -15,6 +16,8 @@ export default class App extends React.Component {
       open: false
     }
     this.selectAnswer = this.selectAnswer.bind(this)
+    this.handleClickOpen = this.handleClickOpen.bind(this)
+    this.handleClose = this.handleClose.bind(this)
   }
 
   displayNextQuestion = (nextQuestionId) => {
@@ -35,6 +38,9 @@ export default class App extends React.Component {
     switch(true){
       case (nextQuestionId === 'init'):
         this.displayNextQuestion(nextQuestionId);
+        break;
+      case (nextQuestionId === 'contact'):
+        this.handleClickOpen();
         break;
       case (/^https:*/.test(nextQuestionId)):
         const a = document.createElement("a");
@@ -58,6 +64,18 @@ export default class App extends React.Component {
     }
   }
 
+  handleClickOpen = () => {
+    this.setState({
+      open: true
+    });
+  };
+
+  handleClose = () => {
+    this.setState({
+      open: false
+    });
+  };
+
   #最初のレンダー後にデータをいれる
   componentDidMount() {
     const initAnswer = "";
@@ -77,6 +95,7 @@ export default class App extends React.Component {
         <div className="chat-area">
           <Chats chats={this.state.chats} />
           <AnswersList answers={this.state.answers} select={this.selectAnswer} />
+          <FormDialog open={this.state.open} handleClose={this.handleClose} />
         </div>
       </div>
     );
