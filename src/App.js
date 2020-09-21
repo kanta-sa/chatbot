@@ -1,9 +1,8 @@
 import React from 'react';
-import defaultDataset from "./dataset";
 import "./assets/styles/style.css";
 import {AnswersList, Chats} from "./components/index"
 import FormDialog from "./components/Forms/FormDialog";
-
+import {db} from './firebase/index';
 
 export default class App extends React.Component {
   constructor(props) {
@@ -12,7 +11,7 @@ export default class App extends React.Component {
       answers: [],
       chats: [],
       currentId: "init",
-      dataset: defaultDataset,
+      dataset: {},
       open: false
     }
     this.selectAnswer = this.selectAnswer.bind(this)
@@ -76,10 +75,26 @@ export default class App extends React.Component {
     });
   };
 
+  initDataset = (dataset) => {
+    this.setState({dataset: dataset});
+  }
+
   #最初のレンダー後にデータをいれる
   componentDidMount() {
-    const initAnswer = "";
-    this.selectAnswer(initAnswer, this.state.currentId);
+    (async() => {
+      const dataset = this.state.dataset
+
+      await db.collection('questions').get().then(snapshots => {
+        snapshots.forEach(doc => {
+          const id = doc.id
+          const data = doc.data()
+          dataset[id] = data
+        })
+      })
+      this.initDataset(dataset)
+      const initAnswer = "";
+      this.selectAnswer(initAnswer, this.state.currentId);
+    })();
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
