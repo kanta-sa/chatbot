@@ -5,6 +5,8 @@ import ListItemText from '@material-ui/core/ListItemText';
 import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import Avatar from '@material-ui/core/Avatar';
 import Typography from '@material-ui/core/Typography';
+import Owner from '../assets/img/owner.jpeg';
+import User from '../assets/img/user.png';
 
 const Chat = (props) => {
   const isQuestion = (props.type === 'question');
@@ -14,9 +16,9 @@ const Chat = (props) => {
         <ListItem className={classes}>
           <ListItemAvatar>
             {isQuestion ? (
-              <Avatar alt="icon" src="/static/images/avatar/1.jpg" />
+              <Avatar alt="icon" src={Owner} />
             ) : (
-              <Avatar alt="icon" src="/static/images/avatar/1.jpg" />
+              <Avatar alt="icon" src={User} />
             )}
 
           </ListItemAvatar>
